@@ -1,37 +1,55 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import { colors } from '../utils/colors';
+import { RoundedButton } from '../components/RoundedButton';
 import { fontSizes, spacing } from '../utils/sizes';
 
-export const FocusHistory = ({ history }) => {
-  if (!history || !history.length) return <Text style={styles.title}>We haven't focused on anything yet!</Text>;
+const HistoryItem = ({ item, index }) => {
+  return <Text style={styles.historyItem(item.status)}>{item.subject}</Text>;
+};
 
-  const renderItem = ({item}) => <Text style={styles.item}>- {item}</Text>
+export const FocusHistory = ({ focusHistory, onClear }) => {
+  const clearHistory = () => {
+    onClear();
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Things we have focused on: </Text>
-      <FlatList 
-      data={history}
-      renderItem={renderItem}/>
-    </View>
+    <>
+      <SafeAreaView style={{ flex: 0.5, alignItems: 'center' }}>
+        {!!focusHistory.length && (
+          <>
+            <Text style={styles.title}>Things we've focused on</Text>
+            <FlatList
+              style={{ flex: 1 }}
+              contentContainerStyle={{ flex: 1, alignItems: 'center' }}
+              data={focusHistory}
+              renderItem={HistoryItem}
+            />
+            <View style={styles.clearContainer}>
+              <RoundedButton
+                size={75}
+                title="Clear"
+                onPress={() => onClear()}
+              />
+            </View>
+          </>
+        )}
+      </SafeAreaView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: spacing.md,
-    flex: 1,
-  },
-  item: {
+  historyItem: (status) => ({
+    color: status > 1 ? 'red' : 'green',
     fontSize: fontSizes.md,
-    color: colors.white,
-    paddingTop: spacing.sm
-  },
+  }),
   title: {
-    color: colors.white,
-    fontSize: fontSizes.md,
-    fontWeight: 'bold',
-    paddingLeft: spacing.sm
+    color: 'white',
+    fontSize: fontSizes.lg,
+  },
+  clearContainer: {
+    alignItems: 'center',
+    padding: spacing.md,
   },
 });
